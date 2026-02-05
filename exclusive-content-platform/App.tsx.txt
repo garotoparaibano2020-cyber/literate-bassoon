@@ -1,0 +1,115 @@
+import { useState } from 'react';
+import { HomePage } from './components/HomePage';
+import { CreatorProfile } from './components/CreatorProfile';
+import { SubscriberFeed } from './components/SubscriberFeed';
+import { AuthModal } from './components/AuthModal';
+
+export type User = {
+  id: string;
+  name: string;
+  email: string;
+  isCreator: boolean;
+  subscribedTo: string[];
+};
+
+export default function App() {
+  const [currentPage, setCurrentPage] = useState<'home' | 'profile' | 'feed'>('home');
+  const [selectedCreatorId, setSelectedCreatorId] = useState<string | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+
+  const handleViewProfile = (creatorId: string) => {
+    setSelectedCreatorId(creatorId);
+    setCurrentPage('profile');
+  };
+
+  const handleSubscribe = (creatorId: string) => {
+    if (!user) {
+      setShowAuthModal(true);
+      return;
+    }
+    setUser({
+      ...user,
+      subscribedTo: [...user.subscribedTo, creatorId]
+    });
+    setCurrentPage('feed');
+  };
+
+  const handleLogin = (email: string, password: string) => {
+    setUser({
+      id: '1',
+      name: 'Usuário',
+      email,
+      isCreator: false,
+      subscribedTo: []
+    });
+    setShowAuthModal(false);
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-950">
+      <header className="bg-gray-900 border-b border-gray-800 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+          <button 
+            onClick={() => setCurrentPage('home')}
+            className="text-2xl font-bold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent"
+          >
+            ExclusiveContent
+          </button>
+          <nav className="flex items-center gap-4">
+            {user && user.subscribedTo.length > 0 && (
+              <button
+                onClick={() => setCurrentPage('feed')}
+                className="text-gray-300 hover:text-white transition"
+              >
+                Meu Feed
+              </button>
+            )}
+            {user ? (
+              <div className="flex items-center gap-3">
+                <span className="text-gray-300">{user.name}</span>
+                <button
+                  onClick={() => setUser(null)}
+                  className="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition"
+                >
+                  Sair
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setShowAuthModal(true)}
+                className="px-6 py-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-lg font-semibold hover:opacity-90 transition"
+              >
+                Entrar
+              </button>
+            )}
+          </nav>
+        </div>
+      </header>
+
+      <main>
+        {currentPage === 'home' && (
+          <HomePage onViewProfile={handleViewProfile} />
+        )}
+        {currentPage === 'profile' && selectedCreatorId && (
+          <CreatorProfile
+            creatorId={selectedCreatorId}
+            isSubscribed={user?.subscribedTo.includes(selectedCreatorId) || false}
+            onSubscribe={handleSubscribe}
+            onBack={() => setCurrentPage('home')}
+          />
+        )}
+        {currentPage === 'feed' && user && (
+          <SubscriberFeed subscribedCreatorIds={user.subscribedTo} />
+        )}
+      </main>
+
+      {showAuthModal && (
+        <AuthModal
+          onClose={() => setShowAuthModal(false)}
+          onLogin={handleLogin}
+        />
+      )}
+    </div>
+  );
+}

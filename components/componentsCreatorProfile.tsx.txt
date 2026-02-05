@@ -1,0 +1,154 @@
+import { ArrowLeft, CheckCircle, Users, FileImage, Video, Lock } from 'lucide-react';
+
+interface CreatorProfileProps {
+  creatorId: string;
+  isSubscribed: boolean;
+  onSubscribe: (creatorId: string) => void;
+  onBack: () => void;
+}
+
+const mockCreatorData: Record<string, any> = {
+  '1': {
+    name: 'Luna Star',
+    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop',
+    cover: 'https://images.unsplash.com/photo-1557683316-973673baf926?w=1200&h=400&fit=crop',
+    subscribers: 12500,
+    postsCount: 234,
+    price: 29.90,
+    verified: true,
+    bio: 'Criadora de conteúdo exclusivo 🔥 Lives toda semana • Fotos e vídeos em alta qualidade • Interação direta com assinantes',
+    previews: [
+      'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=400&h=400&fit=crop',
+      'https://images.unsplash.com/photo-1485178575877-1a13bf489dfe?w=400&h=400&fit=crop',
+      'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=400&h=400&fit=crop',
+    ]
+  }
+};
+
+export function CreatorProfile({ creatorId, isSubscribed, onSubscribe, onBack }: CreatorProfileProps) {
+  const creator = mockCreatorData[creatorId] || mockCreatorData['1'];
+
+  return (
+    <div className="min-h-screen bg-gray-950">
+      <div className="max-w-5xl mx-auto px-4 py-4">
+        <button
+          onClick={onBack}
+          className="flex items-center gap-2 text-gray-400 hover:text-white transition"
+        >
+          <ArrowLeft className="w-5 h-5" />
+          Voltar
+        </button>
+      </div>
+
+      <div className="relative">
+        <div className="h-64 overflow-hidden">
+          <img 
+            src={creator.cover} 
+            alt={creator.name}
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-gray-950 to-transparent" />
+        </div>
+
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="relative -mt-16 flex items-end gap-6 pb-6">
+            <img 
+              src={creator.avatar} 
+              alt={creator.name}
+              className="w-32 h-32 rounded-full border-4 border-gray-950 object-cover"
+            />
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-2">
+                <h1 className="text-3xl font-bold text-white">{creator.name}</h1>
+                {creator.verified && (
+                  <CheckCircle className="w-6 h-6 text-blue-500 fill-blue-500" />
+                )}
+              </div>
+              <div className="flex items-center gap-6 text-gray-400 mb-4">
+                <div className="flex items-center gap-2">
+                  <Users className="w-5 h-5" />
+                  <span>{creator.subscribers.toLocaleString('pt-BR')} assinantes</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <FileImage className="w-5 h-5" />
+                  <span>{creator.postsCount} posts</span>
+                </div>
+              </div>
+            </div>
+            {!isSubscribed && (
+              <div className="text-right">
+                <div className="text-white mb-2">
+                  <span className="text-3xl font-bold">R$ {creator.price.toFixed(2)}</span>
+                  <span className="text-gray-500">/mês</span>
+                </div>
+                <button
+                  onClick={() => onSubscribe(creatorId)}
+                  className="px-8 py-3 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-lg font-semibold hover:opacity-90 transition"
+                >
+                  Assinar Agora
+                </button>
+              </div>
+            )}
+            {isSubscribed && (
+              <div className="px-6 py-3 bg-green-600 text-white rounded-lg font-semibold flex items-center gap-2">
+                <CheckCircle className="w-5 h-5" />
+                Assinante
+              </div>
+            )}
+          </div>
+
+          <p className="text-gray-300 mb-8 max-w-3xl">{creator.bio}</p>
+
+          <div className="mb-12">
+            <h2 className="text-2xl font-bold text-white mb-6">Preview do Conteúdo</h2>
+            <div className="grid grid-cols-3 gap-4">
+              {creator.previews.map((preview: string, index: number) => (
+                <div key={index} className="relative aspect-square rounded-lg overflow-hidden group">
+                  <img 
+                    src={preview} 
+                    alt={`Preview ${index + 1}`}
+                    className="w-full h-full object-cover blur-md group-hover:blur-lg transition"
+                  />
+                  <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                    <div className="text-center">
+                      <Lock className="w-12 h-12 text-white mb-2 mx-auto" />
+                      <p className="text-white font-semibold">Conteúdo Exclusivo</p>
+                      <p className="text-gray-300 text-sm">Assine para desbloquear</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="bg-gray-900 rounded-xl p-6 border border-gray-800 mb-8">
+            <h3 className="text-xl font-bold text-white mb-4">O que você terá acesso:</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="flex items-start gap-3">
+                <FileImage className="w-6 h-6 text-pink-500 flex-shrink-0 mt-1" />
+                <div>
+                  <h4 className="text-white font-semibold mb-1">Fotos Exclusivas</h4>
+                  <p className="text-gray-400 text-sm">Sets de fotos profissionais em alta resolução</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <Video className="w-6 h-6 text-purple-500 flex-shrink-0 mt-1" />
+                <div>
+                  <h4 className="text-white font-semibold mb-1">Vídeos HD</h4>
+                  <p className="text-gray-400 text-sm">Vídeos exclusivos em alta definição</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <Users className="w-6 h-6 text-blue-500 flex-shrink-0 mt-1" />
+                <div>
+                  <h4 className="text-white font-semibold mb-1">Lives Ao Vivo</h4>
+                  <p className="text-gray-400 text-sm">Transmissões ao vivo exclusivas para assinantes</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
